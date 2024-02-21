@@ -33,7 +33,7 @@ function ResponsiveAppBar() {
                     <Typography
                         variant="h6"
                         noWrap
-                        component="a"
+                        component="span"
                         sx={{
                             mr: 2,
                             display: {xs: 'none', md: 'flex'},
@@ -87,7 +87,7 @@ function ResponsiveAppBar() {
                     <Typography
                         variant="h5"
                         noWrap
-                        component="a"
+                        component="span"
                         sx={{
                             mr: 2,
                             display: {xs: 'flex', md: 'none'},
@@ -102,15 +102,17 @@ function ResponsiveAppBar() {
                         <Link className="headerLink" to={"/"}>LOGO</Link>
                     </Typography>
                     <Box sx={{flexGrow: 1, display: {xs: 'none', md: 'flex'}}}>
-                        {pages.map((page) => (
-                            <Button
-                                key={page.name}
-                                onClick={handleCloseNavMenu}
-                                sx={{my: 2, color: 'white', display: 'block'}}
-                            >
-                                <Link className={"headerLink"} to={page.path}>{page.name}</Link>
-                            </Button>
-                        ))}
+                        {pages.map((page) =>
+                            page.isMainNavigation ? (
+                                <Button
+                                    key={page.name}
+                                    onClick={handleCloseNavMenu}
+                                    sx={{my: 2, color: 'white', display: 'block'}}
+                                >
+                                    <Link className={"headerLink"} to={page.path}>{page.name}</Link>
+                                </Button>
+                            ) : null
+                        )}
                     </Box>
                 </Toolbar>
             </Container>
