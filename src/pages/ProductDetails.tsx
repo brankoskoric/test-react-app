@@ -25,21 +25,21 @@ const ProductDetails = () => {
             <div className={"user-detail-container"}>
                 <Grid container spacing={1}>
                     <Grid item xs={12} md={6}>
-                        <ButtonBase >
+                        <ButtonBase>
                             <img className={"main-image"} alt="complex" src={product?.thumbnail}/>
                         </ButtonBase>
                     </Grid>
-                    <Grid item xs={12} md={6} sx={{textAlign:"left"}}>
+                    <Grid item xs={12} md={6} sx={{textAlign: "left"}}>
                         <Typography variant="subtitle1" component="div">
                             {product?.brand}
                         </Typography>
                         <Typography variant="h4" component="div">
                             {product?.title}
                         </Typography>
-                        <Typography gutterBottom variant="body1" component="div">
+                        <Typography sx={{width: "90%"}} gutterBottom variant="body1" component="div">
                             {product?.description}
                         </Typography>
-                        <Divider/>
+                        <Divider sx={{width: "90%"}}/>
                         <div style={{marginTop: "20px"}}>
                             <Chip label={product?.category} variant="outlined" color="primary"/>
                             <Chip label={"Rating: " + product?.rating} variant="outlined"/>

@@ -11,6 +11,7 @@ export interface Product {
     thumbnail: string
 }
 
-export interface ProductList {
+export interface ProductListResponse {
     products: Product[]
+    total: number
 }
