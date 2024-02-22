@@ -7,9 +7,16 @@ import Avatar from '@mui/material/Avatar';
 import Typography from '@mui/material/Typography';
 import {ProductProps} from "../../interfaces/Properties.tsx";
 import {Button} from "@mui/material";
+import {useNavigate} from "react-router-dom";
+import {findPath} from "../../routes/RoutesList.tsx";
+import RoutesIds from "../../routes/RoutesIds.tsx";
 
 const ProductList = (props: ProductProps) => {
     const {product} = props
+    const navigate = useNavigate()
+    const navigateProductDetail = () => {
+        navigate(`${findPath(RoutesIds.PRODUCT_DETAIL)}/${product.id}`)
+    }
 
     return (
         <List sx={{width: '100%', maxWidth: 800, bgcolor: 'background.paper'}}>
@@ -50,7 +57,7 @@ const ProductList = (props: ProductProps) => {
                 <ListItemText
                     secondary={
                         <>
-                            <Button>Details</Button>
+                            <Button onClick={navigateProductDetail}>Details</Button>
                         </>
                     }
                 />

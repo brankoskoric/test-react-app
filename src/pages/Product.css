@@ -4,3 +4,36 @@
         width: 50%;
     }
 }
+
+.user-detail-container {
+    #margin-left: auto;
+    #margin-right: auto;
+    margin-top: 30px;
+    #width: 80%;
+}
+
+.price-number {
+    margin-top: 20px;
+    font-size: 36px;
+    color: darkred;
+}
+
+.price-saving {
+    color: #f6a800;
+    font-size: .875rem;
+    font-weight: 500;
+    letter-spacing: .025rem;
+    line-height: 1.5;
+}
+
+.add-to-cart {
+    margin-top: 20px;
+}
+
+.add-to-cart button{
+    width: 90%;
+}
+
+.main-image {
+    max-width: 100%;
+}

@@ -1,11 +1,14 @@
 import {Button, Typography} from "@mui/material";
 import {useNavigate} from "react-router-dom";
+import {findPath} from "../routes/RoutesList.tsx";
+import RoutesIds from "../routes/RoutesIds.tsx";
 
 const Dashboard = () => {
     const navigate = useNavigate()
     const navigateProducts = () => {
-        navigate("/products")
+        navigate(findPath(RoutesIds.PRODUCTS))
     }
+
     return (
         <div>
             <Typography gutterBottom variant="h3" component="div">

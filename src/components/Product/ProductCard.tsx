@@ -1,9 +1,17 @@
 import {Button, Card, CardActions, CardContent, CardMedia, Chip, Divider, Typography} from "@mui/material";
 import SendIcon from '@mui/icons-material/Send';
 import {ProductProps} from "../../interfaces/Properties.tsx";
+import {useNavigate} from "react-router-dom";
+import {findPath} from "../../routes/RoutesList.tsx";
+import RoutesIds from "../../routes/RoutesIds.tsx";
 
 const ProductCard = (props: ProductProps) => {
     const {product} = props
+    const navigate = useNavigate()
+    const navigateProductDetail = () => {
+        navigate(`${findPath(RoutesIds.PRODUCT_DETAIL)}/${product.id}`)
+    }
+
     return (
         <Card sx={{width: 350, height: 400, marginBottom: "20px"}}>
             <CardMedia
@@ -30,7 +38,7 @@ const ProductCard = (props: ProductProps) => {
                 <Chip label={"In stock: " + product.stock} variant="outlined"/>
             </CardActions>
             <CardActions>
-                <Button startIcon={<SendIcon/>}>Details</Button>
+                <Button startIcon={<SendIcon/>} onClick={navigateProductDetail}>Details</Button>
             </CardActions>
         </Card>
     )
