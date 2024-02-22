@@ -1,11 +1,14 @@
 import axios from "axios";
-import {Card, CardActions, CardContent, CardMedia, Chip, Divider, Grid, Typography} from "@mui/material";
+import {Grid, Switch, Typography} from "@mui/material";
 import {Product, ProductList} from "../interfaces/Entities.tsx";
 import {useEffect, useState} from "react";
-import {Link} from "react-router-dom";
+import ProductCard from "../components/Product/ProductCard.tsx";
+import ProductListComponent from "../components/Product/ProductList.tsx";
+import "../pages/Product.css"
 
 const Products = () => {
     const [products, setProducts] = useState<Product[]>();
+    const [showAsListChecked, setShowAsListChecked] = useState(false);
 
     useEffect(() => {
         axios.get<ProductList>('https://dummyjson.com/products')
@@ -19,42 +22,37 @@ const Products = () => {
             <Typography component="div" variant="h4" gutterBottom>
                 All products
             </Typography>
-            <Grid container spacing={1}>
-                {products?.map((product) => (
 
-                    <Grid xs={4} md={4}>
-                        <Card sx={{maxWidth: 345}}>
-                            <CardMedia
-                                component="img"
-                                alt="green iguana"
-                                height="140"
-                                image={product.thumbnail}
-                            />
-                            <CardContent>
-                                <Typography gutterBottom variant="h5" component="div">
-                                    {product.title}
-                                </Typography>
-                                <Typography variant="body2" color="text.secondary">
-                                    {product.description}
-                                </Typography>
-                                <Divider/>
-                                <Typography variant="body2" color="text.primary">
-                                    {product.price}$
-                                </Typography>
-                            </CardContent>
-                            <CardActions>
-                                <Chip label={product.category} variant="outlined" color="primary"/>
-                                <Chip label={"Rating: " + product.rating} variant="outlined"/>
-                                <Chip label={"In stock: " + product.stock} variant="outlined"/>
-                            </CardActions>
-                            <CardActions>
-                                <Link to={"/products/" + product.id}>Details</Link>
-                            </CardActions>
-                        </Card>
+            Show as list <Switch checked={showAsListChecked}
+                                 onChange={() => {
+                                     setShowAsListChecked(!showAsListChecked);
+                                 }}/>
+
+            {showAsListChecked &&
+                <div className={'product-list-container'}>
+                    {products?.map((product) => (
+                        <ProductListComponent product={product}/>
+                    ))}
+                </div>}
+
+
+            {!showAsListChecked && <Grid
+                container
+                direction="row"
+                justifyContent="space-evenly"
+                alignItems="center"
+            >
+                {products?.map((product) => (
+                    <Grid key={product.id} xs={12} md={4}
+                          display="flex"
+                          justifyContent="center"
+                          alignItems="center">
+                        <ProductCard product={product}/>
                     </Grid>
                 ))
                 }
             </Grid>
+            }
         </div>
     )
 }
