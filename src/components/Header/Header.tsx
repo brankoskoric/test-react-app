@@ -77,9 +77,11 @@ function ResponsiveAppBar() {
                             }}
                         >
                             {pages.map((page) => (
-                                <MenuItem key={page.name} onClick={handleCloseNavMenu}>
-                                    <Link className={"navMenuHeaderLink"} to={page.path}>{page.name}</Link>
-                                </MenuItem>
+                                page.isMainNavigation ? (
+                                    <MenuItem key={page.name} onClick={handleCloseNavMenu}>
+                                        <Link className={"navMenuHeaderLink"} to={page.path}>{page.name}</Link>
+                                    </MenuItem>
+                                ): null
                             ))}
                         </Menu>
                     </Box>
@@ -104,13 +106,15 @@ function ResponsiveAppBar() {
                     <Box sx={{flexGrow: 1, display: {xs: 'none', md: 'flex'}}}>
                         {pages.map((page) =>
                             page.isMainNavigation ? (
-                                <Button
-                                    key={page.name}
-                                    onClick={handleCloseNavMenu}
-                                    sx={{my: 2, color: 'white', display: 'block'}}
-                                >
-                                    <Link className={"headerLink"} to={page.path}>{page.name}</Link>
-                                </Button>
+                                <Link className={"headerLink"} to={page.path}>
+                                    <Button
+                                        key={page.name}
+                                        onClick={handleCloseNavMenu}
+                                        sx={{my: 2, color: 'white', display: 'block'}}
+                                    >
+                                        {page.name}
+                                    </Button>
+                                </Link>
                             ) : null
                         )}
                     </Box>
