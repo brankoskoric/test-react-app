@@ -7,11 +7,14 @@ import ProductListComponent from "../components/Product/ProductList.tsx";
 import "../pages/Product.css"
 import {useLocation} from "react-router-dom";
 import PaginationComponent from "../components/Pagination/Pagination.tsx";
+import ErrorComponent from "../components/Error/ErrorComponent.tsx";
 
 const Products = () => {
     const [products, setProducts] = useState<Product[]>();
     const [showAsListChecked, setShowAsListChecked] = useState(false);
     const [totalItems, setTotalItems] = useState(0);
+    const [isError, setIsError] = useState(false)
+    const [errorMessage, setErrorMessage] = useState("")
 
     const useQuery = () => {
         const {search} = useLocation();
@@ -29,6 +32,13 @@ const Products = () => {
                 setProducts(response.data.products)
                 setTotalItems(response.data.total);
             })
+            .catch((err) => {
+                if (axios.isAxiosError(err)) {
+                    setIsError(true)
+                    setErrorMessage("Sorry, we can't show products at the moment. Please, try later.")
+                }
+                console.log(err)
+            })
     }, [currentPage]);
     return (
         <div>
@@ -36,44 +46,48 @@ const Products = () => {
                 All products
             </Typography>
 
-            Show as list <Switch checked={showAsListChecked}
-                                 onChange={() => {
-                                     setShowAsListChecked(!showAsListChecked);
-                                 }}/>
+            {!isError && <>
+                Show as list <Switch checked={showAsListChecked}
+                                     onChange={() => {
+                                         setShowAsListChecked(!showAsListChecked);
+                                     }}/>
 
-            {showAsListChecked &&
-                <div className={'product-list-container'}>
-                    {products?.map((product) => (
-                        <ProductListComponent product={product}/>
-                    ))}
-                </div>}
-
-
-            {!showAsListChecked &&
-                <>
-                    <Grid
-                        container
-                        direction="row"
-                        justifyContent="space-evenly"
-                        alignItems="center"
-                    >
+                {showAsListChecked &&
+                    <div className={'product-list-container'}>
                         {products?.map((product) => (
-                            <Grid key={product.id} xs={12} md={4}
-                                  display="flex"
-                                  justifyContent="center"
-                                  alignItems="center">
-                                <ProductCard product={product}/>
-                            </Grid>
-                        ))
-                        }
-                    </Grid>
-                </>
-            }
-            <Box display="flex"
-                 justifyContent='center'
-                 sx={{m: 2}}>
-                <PaginationComponent page={currentPage} totalItems={totalItems} pageLimit={defaultPageSize}/>
-            </Box>
+                            <ProductListComponent product={product}/>
+                        ))}
+                    </div>}
+
+
+                {!showAsListChecked &&
+                    <>
+                        <Grid
+                            container
+                            direction="row"
+                            justifyContent="space-evenly"
+                            alignItems="center"
+                        >
+                            {products?.map((product) => (
+                                <Grid key={product.id} xs={12} md={4}
+                                      display="flex"
+                                      justifyContent="center"
+                                      alignItems="center">
+                                    <ProductCard product={product}/>
+                                </Grid>
+                            ))
+                            }
+                        </Grid>
+                    </>
+                }
+                <Box display="flex"
+                     justifyContent='center'
+                     sx={{m: 2}}>
+                    <PaginationComponent page={currentPage} totalItems={totalItems} pageLimit={defaultPageSize}/>
+                </Box>
+            </>}
+
+            {isError && <ErrorComponent message={errorMessage}/>}
         </div>
     )
 }

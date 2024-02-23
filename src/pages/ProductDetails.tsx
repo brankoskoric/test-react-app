@@ -4,15 +4,25 @@ import {useEffect, useState} from "react";
 import {Product} from "../interfaces/Entities.tsx";
 import axios from "axios";
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import ErrorComponent from "../components/Error/ErrorComponent.tsx";
 
 const ProductDetails = () => {
     const {productId} = useParams()
     const [product, setProduct] = useState<Product>();
+    const [isError, setIsError] = useState(false)
+    const [errorMessage, setErrorMessage] = useState("")
 
     useEffect(() => {
         axios.get<Product>(`https://dummyjson.com/products/${productId}`)
             .then((response) => {
                 setProduct(response.data)
+            })
+            .catch((err) => {
+                if (axios.isAxiosError(err)) {
+                    setIsError(true)
+                    setErrorMessage("Sorry, we can't show product at the moment. Please, try later.")
+                }
+                console.log(err)
             })
     }, []);
 
@@ -22,7 +32,7 @@ const ProductDetails = () => {
                 Product details page
             </Typography>
 
-            <div className={"user-detail-container"}>
+            {!isError && <div className={"user-detail-container"}>
                 <Grid container spacing={1}>
                     <Grid item xs={12} md={6}>
                         <ButtonBase>
@@ -57,7 +67,9 @@ const ProductDetails = () => {
                         </div>
                     </Grid>
                 </Grid>
-            </div>
+            </div>}
+
+            {isError && <ErrorComponent message={errorMessage}/>}
         </div>
     )
 }
