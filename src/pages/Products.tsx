@@ -12,7 +12,7 @@ import ErrorComponent from "../components/Error/ErrorComponent.tsx";
 
 const Products = () => {
     const [products, setProducts] = useState<Product[]>();
-    const [categories, setCategories] = useState<string[]>();
+    const [categories, setCategories] = useState<string[]>([]);
     const [showAsListChecked, setShowAsListChecked] = useState(false);
     const [totalItems, setTotalItems] = useState(0);
     const [isError, setIsError] = useState(false)
