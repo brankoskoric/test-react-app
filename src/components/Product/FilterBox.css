@@ -1,0 +1,29 @@
+.filter-box {
+    padding: 20px;
+    text-align: left;
+    margin-bottom: 10px;
+}
+
+.filter-box-paper {
+    padding: 2px 4px;
+    display: flex;
+    align-items: center;
+    width: 50%
+}
+
+.filter-box-select {
+    width: 40%;
+}
+
+@media only screen and (max-width: 768px) {
+    .filter-box-paper {
+        padding: 2px 4px;
+        display: flex;
+        align-items: center;
+        width: 100%
+    }
+
+    .filter-box-select {
+        width: 30%;
+    }
+}
