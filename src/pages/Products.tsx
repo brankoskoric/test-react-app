@@ -1,7 +1,7 @@
 import axios from "axios";
 import {Box, debounce, Grid, SelectChangeEvent, Switch, Typography} from "@mui/material";
-import {Product, ProductListResponse} from "../interfaces/Entities.tsx";
-import React, {ChangeEvent, useEffect, useState} from "react";
+import {ProductListResponse} from "../interfaces/Entities.tsx";
+import React, {ChangeEvent, useState} from "react";
 import ProductCard from "../components/Product/ProductCard.tsx";
 import ProductListComponent from "../components/Product/ProductList.tsx";
 import FilterBox from "../components/Product/FilterBox.tsx";
@@ -9,89 +9,90 @@ import "../pages/Product.css"
 import {useLocation} from "react-router-dom";
 import PaginationComponent from "../components/Pagination/Pagination.tsx";
 import ErrorComponent from "../components/Error/ErrorComponent.tsx";
+import {useQuery, useQueryClient} from "@tanstack/react-query";
+import PendingComponent from "../components/Pending/PendingComponent.tsx";
 
 const Products = () => {
-    const [products, setProducts] = useState<Product[]>();
-    const [categories, setCategories] = useState<string[]>([]);
     const [showAsListChecked, setShowAsListChecked] = useState(false);
     const [totalItems, setTotalItems] = useState(0);
-    const [isError, setIsError] = useState(false)
-    const [errorMessage, setErrorMessage] = useState("")
+    const errorMessage: string = "Sorry, we can't show products at the moment. Please, try later."
 
-    const useQuery = () => {
+    const useLocationQuery = () => {
         const {search} = useLocation();
         return React.useMemo(() => new URLSearchParams(search), [search]);
     }
     const defaultPageSize = 6;
-    const query = useQuery();
+    const query = useLocationQuery();
     const currentPage: number = parseInt(query.get('page') ? query.get('page')! : '1');
     const skip: number = parseInt(query.get('skip') ? query.get('skip')! : '0');
     const limit: number = parseInt(query.get('limit') ? query.get('limit')! : `${defaultPageSize}`);
 
-    const getCategories = () => {
-        axios.get<string[]>(`https://dummyjson.com/products/categories`)
-            .then((response) => {
-                setCategories(response.data)
-            })
-            .catch((err) => {
-                console.log(err)
-            })
+    const queryClient = useQueryClient()
+
+    const getCategories = async () => {
+        const response = await axios.get<string[]>(`https://dummyjson.com/products/categories`)
+        return response.data
     }
 
-    const getAllProducts = () => {
-        axios.get<ProductListResponse>(`https://dummyjson.com/products?page=${currentPage}&limit=${limit}&skip=${skip}`)
-            .then((response) => {
-                setProducts(response.data.products)
-                setTotalItems(response.data.total);
-                getCategories()
-            })
-            .catch((err) => {
-                if (axios.isAxiosError(err)) {
-                    setIsError(true)
-                    setErrorMessage("Sorry, we can't show products at the moment. Please, try later.")
-                }
-                console.log(err)
-            })
+    const getProducts = async () => {
+        const response = await
+            axios.get<ProductListResponse>(`https://dummyjson.com/products?page=${currentPage}&limit=${limit}&skip=${skip}`)
+        setTotalItems(response.data.total)
+        return response.data.products
     }
 
-    const searchProducts = (term: string) => {
-        axios.get<ProductListResponse>(`https://dummyjson.com/products/search?q=${term}`)
-            .then((response) => {
-                setProducts(response.data.products)
-                setTotalItems(response.data.total);
-            })
-            .catch((err) => {
-                console.log(err)
-            })
+    const {
+        isPending: isProductsDataPending,
+        isError: isProductsError,
+        data: productsData
+    } = useQuery({
+        queryKey: ['products'],
+        queryFn: getProducts,
+    })
+
+    const {
+        data: categoriesData
+    } = useQuery({
+        queryKey: ['categories'],
+        queryFn: getCategories,
+    })
+
+    const searchProducts = async (term: string) => {
+        const response = await
+            axios.get<ProductListResponse>(`https://dummyjson.com/products/search?q=${term}`)
+        setTotalItems(response.data.total)
+        return response.data.products
     }
 
-    const getProductsByCategories = (category: string) => {
-        axios.get<ProductListResponse>(`https://dummyjson.com/products/category/${category}`)
-            .then((response) => {
-                setProducts(response.data.products)
-                setTotalItems(response.data.total);
-            })
-            .catch((err) => {
-                console.log(err)
-            })
+    const getProductsByCategories = async (category: string) => {
+        const response = await
+            axios.get<ProductListResponse>(`https://dummyjson.com/products/category/${category}`)
+        setTotalItems(response.data.total)
+        return response.data.products
     }
-
-    useEffect(() => {
-        getAllProducts()
-    }, [currentPage]);
 
     const handleCategoryChange = (event: SelectChangeEvent) => {
         event.preventDefault()
         getProductsByCategories(event.target.value)
+            .then((products) => {
+                queryClient.setQueryData(['products'], () => products)
+            })
     }
 
     const handleSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
         debouncedSearch(event.target.value)
     }
 
+    const handleClear = async () => {
+        await queryClient.refetchQueries({queryKey: ['products'], type: 'active'})
+    }
+
     const debouncedSearch = React.useRef(
         debounce(async (criteria: string) => {
             searchProducts(criteria)
+                .then((products) => {
+                    queryClient.setQueryData(['products'], () => products)
+                })
         }, 300)
     ).current;
 
@@ -101,21 +102,24 @@ const Products = () => {
                 All products
             </Typography>
 
-            {!isError && <>
+            {isProductsDataPending && <PendingComponent/>}
+            {isProductsError && <ErrorComponent message={errorMessage}/>}
+
+            {!isProductsError && !isProductsDataPending && <>
                 Show as list <Switch checked={showAsListChecked}
                                      onChange={() => {
                                          setShowAsListChecked(!showAsListChecked);
                                      }}/>
 
-                <FilterBox categories={categories}
+                <FilterBox categories={categoriesData ? categoriesData : [""]}
                            handleCategoryChange={handleCategoryChange}
                            selectName={"Categories"}
-                           handleClear={getAllProducts}
+                           handleClear={handleClear}
                            handleSearchChange={handleSearchChange}/>
 
                 {showAsListChecked &&
                     <div className={'product-list-container'}>
-                        {products?.map((product) => (
+                        {productsData?.map((product) => (
                             <ProductListComponent product={product}/>
                         ))}
                     </div>}
@@ -129,7 +133,7 @@ const Products = () => {
                             justifyContent="space-evenly"
                             alignItems="center"
                         >
-                            {products?.map((product) => (
+                            {productsData?.map((product) => (
                                 <Grid item key={product.id} xs={12} md={4}
                                       display="flex"
                                       justifyContent="center"
@@ -147,8 +151,6 @@ const Products = () => {
                     <PaginationComponent page={currentPage} totalItems={totalItems} pageLimit={defaultPageSize}/>
                 </Box>
             </>}
-
-            {isError && <ErrorComponent message={errorMessage}/>}
         </div>
     )
 }
