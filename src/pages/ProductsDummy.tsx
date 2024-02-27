@@ -9,10 +9,10 @@ import PaginationComponent from "../components/Pagination/Pagination.tsx";
 import ErrorComponent from "../components/Error/ErrorComponent.tsx";
 import {useQueryClient} from "@tanstack/react-query";
 import PendingComponent from "../components/Pending/PendingComponent.tsx";
-import useAllCategories from "../services/CategoryService.tsx";
-import useAllProducts, {getProductsByCategories, searchProducts} from "../services/ProductService.tsx";
+import useAllCategories from "../services/dummy/CategoryService.tsx";
+import useAllProductsDummy, {getProductsByCategories, searchProducts} from "../services/dummy/ProductService.tsx";
 
-const Products = () => {
+const ProductsDummy = () => {
     const [showAsListChecked, setShowAsListChecked] = useState(false);
     const [totalItems, setTotalItems] = useState(0);
     const errorMessage: string = "Sorry, we can't show products at the moment. Please, try later."
@@ -24,8 +24,8 @@ const Products = () => {
     const defaultPageSize = 6;
     const query = useLocationQuery();
     const currentPage: number = parseInt(query.get('page') ? query.get('page')! : '1');
-/*    const skip: number = parseInt(query.get('skip') ? query.get('skip')! : '0');
-    const limit: number = parseInt(query.get('limit') ? query.get('limit')! : `${defaultPageSize}`);*/
+    const skip: number = parseInt(query.get('skip') ? query.get('skip')! : '0');
+    const limit: number = parseInt(query.get('limit') ? query.get('limit')! : `${defaultPageSize}`);
 
     const queryClient = useQueryClient()
 
@@ -33,11 +33,11 @@ const Products = () => {
         isPending: isProductsDataPending,
         isError: isProductsError,
         data: productsData
-    } = useAllProducts()
+    } = useAllProductsDummy({currentPage, limit, skip})
 
     useEffect(() => {
         if (productsData) {
-            setTotalItems(productsData.numberOfElements)
+            setTotalItems(productsData.total)
         }
     }, [productsData])
 
@@ -49,7 +49,7 @@ const Products = () => {
         event.preventDefault()
         getProductsByCategories(event.target.value)
             .then((products) => {
-                queryClient.setQueryData(['products'], () => products)
+                queryClient.setQueryData(['products_dummy'], () => products)
             })
     }
 
@@ -58,14 +58,14 @@ const Products = () => {
     }
 
     const handleClear = async () => {
-        await queryClient.refetchQueries({queryKey: ['products'], type: 'active'})
+        await queryClient.refetchQueries({queryKey: ['products_dummy'], type: 'active'})
     }
 
     const debouncedSearch = React.useRef(
         debounce(async (criteria: string) => {
             searchProducts(criteria)
                 .then((products) => {
-                    queryClient.setQueryData(['products'], () => products)
+                    queryClient.setQueryData(['products_dummy'], () => products)
                 })
         }, 300)
     ).current;
@@ -73,7 +73,7 @@ const Products = () => {
     return (
         <div>
             <Typography component="div" variant="h4" gutterBottom>
-                All products from Render
+                All products from dummyJSON
             </Typography>
 
             {isProductsDataPending && <PendingComponent/>}
@@ -93,10 +93,11 @@ const Products = () => {
 
                 {showAsListChecked &&
                     <div className={'product-list-container'}>
-                        {productsData.content?.map((product) => (
-                            <ProductListComponent product={product} isDummy={false}/>
+                        {productsData.products?.map((product) => (
+                            <ProductListComponent product={product} isDummy/>
                         ))}
                     </div>}
+
 
                 {!showAsListChecked &&
                     <>
@@ -106,12 +107,12 @@ const Products = () => {
                             justifyContent="space-evenly"
                             alignItems="center"
                         >
-                            {productsData.content?.map((product) => (
+                            {productsData.products?.map((product) => (
                                 <Grid item key={product.id} xs={12} md={4}
                                       display="flex"
                                       justifyContent="center"
                                       alignItems="center">
-                                    <ProductCard product={product} isDummy={false}/>
+                                    <ProductCard product={product} isDummy/>
                                 </Grid>
                             ))
                             }
@@ -128,4 +129,4 @@ const Products = () => {
     )
 }
 
-export default Products
+export default ProductsDummy

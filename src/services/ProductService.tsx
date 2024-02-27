@@ -1,12 +1,13 @@
+import {ProductListResponse} from "../interfaces/Entities.tsx";
 import axios from "axios";
 import {useQuery} from "@tanstack/react-query";
-import {ProductListResponse} from "../interfaces/Entities.tsx";
 
-const useAllProducts = ({currentPage, limit, skip}: { currentPage: number, limit: number, skip: number }) => {
+const useAllProducts = () => {
 
-    const getProducts = async ():Promise<ProductListResponse> => {
+    const getProducts = async (): Promise<ProductListResponse> => {
         const response = await
-            axios.get<ProductListResponse>(`https://dummyjson.com/products?page=${currentPage}&limit=${limit}&skip=${skip}`)
+            axios.get<ProductListResponse>(`https://product-backend-wwcv.onrender.com/api/v1/products`)
+        console.log(response.data)
         return response.data
     }
 
@@ -18,13 +19,13 @@ const useAllProducts = ({currentPage, limit, skip}: { currentPage: number, limit
 
 export const searchProducts = async (term: string) => {
     const response = await
-        axios.get<ProductListResponse>(`https://dummyjson.com/products/search?q=${term}`)
+        axios.get<ProductListResponse>(`https://product-backend-wwcv.onrender.com/api/v1/products?title=${term}`)
     return response.data
 }
 
 export const getProductsByCategories = async (category: string) => {
     const response = await
-        axios.get<ProductListResponse>(`https://dummyjson.com/products/category/${category}`)
+        axios.get<ProductListResponse>(`https://product-backend-wwcv.onrender.com/api/v1/products?category=${category}`)
     return response.data
 }
 

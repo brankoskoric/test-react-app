@@ -15,7 +15,11 @@ const ProductList = (props: ProductProps) => {
     const {product} = props
     const navigate = useNavigate()
     const navigateProductDetail = () => {
-        navigate(`${findPath(RoutesIds.PRODUCT_DETAIL)}/${product.id}`)
+        if (props.isDummy) {
+            navigate(`${findPath(RoutesIds.PRODUCT_DETAIL_DUMMY)}/${product.id}`)
+        } else {
+            navigate(`${findPath(RoutesIds.PRODUCT_DETAIL)}/${product.id}`)
+        }
     }
 
     return (

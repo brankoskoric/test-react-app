@@ -8,10 +8,16 @@ export interface Product {
     stock: number,
     brand: string,
     category: string,
-    thumbnail: string
+    thumbnail: string,
+    imageUrl: string
+}
+
+export interface ProductListResponseDummy {
+    products: Product[]
+    total: number
 }
 
 export interface ProductListResponse {
-    products: Product[]
-    total: number
+    content: Product[]
+    numberOfElements: number
 }

@@ -32,7 +32,9 @@ const AddProduct = () => {
         stock: 0,
         brand: '',
         category: '',
-        thumbnail: ''
+        thumbnail: '',
+        imageUrl:''
+
     }
 
     const [productFormData, setProductFormData] = useState<Product>(emptyProduct)

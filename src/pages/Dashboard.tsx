@@ -6,7 +6,7 @@ import RoutesIds from "../routes/RoutesIds.tsx";
 const Dashboard = () => {
     const navigate = useNavigate()
     const navigateProducts = () => {
-        navigate(findPath(RoutesIds.PRODUCTS))
+        navigate(findPath(RoutesIds.PRODUCTS_DUMMY))
     }
 
     const navigateNewProduct = () => {

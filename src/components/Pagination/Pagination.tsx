@@ -12,7 +12,7 @@ const PaginationComponent = ({page, totalItems, pageLimit}: { page: number, tota
             renderItem={(item) => (
                 <PaginationItem
                     component={Link}
-                    to={`${findPath(RoutesIds.PRODUCTS)}${item.page == 1 ? '' : `?page=${item.page}&limit=${pageLimit}&skip=${(item.page! - 1) * pageLimit}`}`}
+                    to={`${findPath(RoutesIds.PRODUCTS_DUMMY)}${item.page == 1 ? '' : `?page=${item.page}&limit=${pageLimit}&skip=${(item.page! - 1) * pageLimit}`}`}
                     {...item}
                 />
             )}

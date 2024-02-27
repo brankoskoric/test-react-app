@@ -1,25 +1,37 @@
 import {useParams} from "react-router-dom";
 import {Button, ButtonBase, Chip, Divider, Grid, Typography} from "@mui/material";
-import {Product} from "../interfaces/Entities.tsx";
 import axios from "axios";
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import ErrorComponent from "../components/Error/ErrorComponent.tsx";
-import {useQuery} from "@tanstack/react-query";
+import {useQuery, useQueryClient} from "@tanstack/react-query";
 import PendingComponent from "../components/Pending/PendingComponent.tsx";
+import {Product} from "../interfaces/Entities.tsx";
+import {useEffect} from "react";
 
-const ProductDetails = () => {
+const ProductDetails = ({isDummy}: { isDummy: boolean }) => {
     const {productId} = useParams()
     const errorMessage: string = "Sorry, we can't show product at the moment. Please, try later."
+    const queryClient = useQueryClient()
+
+    useEffect(() => {
+        queryClient.removeQueries({queryKey: ["productDetails"], exact: true})
+    }, [])
 
     const fetchProduct = async () => {
-        const response =
-            await axios.get<Product>(`https://dummyjson.com/products/${productId}`)
+        let url
+        if (isDummy) {
+            url = `https://dummyjson.com/products/${productId}`
+        } else {
+            url = `https://product-backend-wwcv.onrender.com/api/v1/products/${productId}`
+        }
+        console.log(url)
+        const response = await axios.get<Product>(url)
         return response.data;
     }
 
     const {isPending, isError, data} = useQuery({
             queryKey: ['productDetails'],
-            queryFn: fetchProduct,
+            queryFn: fetchProduct
         }
     )
 
@@ -38,7 +50,8 @@ const ProductDetails = () => {
                     <Grid container spacing={1}>
                         <Grid item xs={12} md={6}>
                             <ButtonBase>
-                                <img className={"main-image"} alt="complex" src={data?.thumbnail}/>
+                                <img className={"main-image"} alt="complex"
+                                     src={data?.thumbnail ? data.thumbnail : data.imageUrl}/>
                             </ButtonBase>
                         </Grid>
                         <Grid item xs={12} md={6} sx={{textAlign: "left"}}>
@@ -53,16 +66,16 @@ const ProductDetails = () => {
                             </Typography>
                             <Divider sx={{width: "90%"}}/>
                             <div style={{marginTop: "20px"}}>
-                                <Chip label={data?.category} variant="outlined" color="primary"/>
-                                <Chip label={"Rating: " + data?.rating} variant="outlined"/>
-                                <Chip label={"In stock: " + data?.stock} variant="outlined"/>
+                                <Chip label={data.category} variant="outlined" color="primary"/>
+                                {data.rating && <Chip label={"Rating: " + data.rating} variant="outlined"/>}
+                                {data.stock && <Chip label={"In stock: " + data.stock} variant="outlined"/>}
                             </div>
                             <div className={"price-number"}>
                                 {data?.price}$
                             </div>
-                            <div className={"price-saving"}>
-                                Save {data?.discountPercentage}%
-                            </div>
+                            {data.discountPercentage && <div className={"price-saving"}>
+                                Save {data.discountPercentage}%
+                            </div>}
 
                             <div className="add-to-cart">
                                 <Button variant="contained" endIcon={<ShoppingCartIcon/>}>Add </Button>

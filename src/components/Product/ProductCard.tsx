@@ -9,7 +9,11 @@ const ProductCard = (props: ProductProps) => {
     const {product} = props
     const navigate = useNavigate()
     const navigateProductDetail = () => {
-        navigate(`${findPath(RoutesIds.PRODUCT_DETAIL)}/${product.id}`)
+        if (props.isDummy) {
+            navigate(`${findPath(RoutesIds.PRODUCT_DETAIL_DUMMY)}/${product.id}`)
+        } else {
+            navigate(`${findPath(RoutesIds.PRODUCT_DETAIL)}/${product.id}`)
+        }
     }
 
     return (
@@ -18,7 +22,7 @@ const ProductCard = (props: ProductProps) => {
                 component="img"
                 alt="green iguana"
                 height="140"
-                image={product.thumbnail}
+                image={product.thumbnail ? product.thumbnail : product.imageUrl}
             />
             <CardContent>
                 <Typography gutterBottom variant="h5" component="div">
@@ -34,8 +38,8 @@ const ProductCard = (props: ProductProps) => {
             </CardContent>
             <CardActions>
                 <Chip label={product.category} variant="outlined" color="primary"/>
-                <Chip label={"Rating: " + product.rating} variant="outlined"/>
-                <Chip label={"In stock: " + product.stock} variant="outlined"/>
+                {product.rating && <Chip label={"Rating: " + product.rating} variant="outlined"/>}
+                {product.stock && <Chip label={"In stock: " + product.stock} variant="outlined"/>}
             </CardActions>
             <CardActions>
                 <Button startIcon={<SendIcon/>} onClick={navigateProductDetail}>Details</Button>
