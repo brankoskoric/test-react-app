@@ -3,17 +3,7 @@ import MenuItem from "@mui/material/MenuItem";
 import IconButton from "@mui/material/IconButton";
 import {ChangeEvent, useState} from "react";
 import "../../components/Product/FilterBox.css"
-
-interface ProductFilterBoxProps {
-    categories: string[],
-    selectName: string,
-
-    handleCategoryChange(event: SelectChangeEvent): void
-
-    handleClear(): void
-
-    handleSearchChange(event: ChangeEvent<HTMLInputElement>): void
-}
+import {ProductFilterBoxProps} from "../../interfaces/Properties.tsx";
 
 const FilterBox = (props: ProductFilterBoxProps) => {
     const {categories, selectName} = props

@@ -1,7 +1,5 @@
-import axios from "axios";
 import {Box, debounce, Grid, SelectChangeEvent, Switch, Typography} from "@mui/material";
-import {ProductListResponse} from "../interfaces/Entities.tsx";
-import React, {ChangeEvent, useState} from "react";
+import React, {ChangeEvent, useEffect, useState} from "react";
 import ProductCard from "../components/Product/ProductCard.tsx";
 import ProductListComponent from "../components/Product/ProductList.tsx";
 import FilterBox from "../components/Product/FilterBox.tsx";
@@ -9,8 +7,10 @@ import "../pages/Product.css"
 import {useLocation} from "react-router-dom";
 import PaginationComponent from "../components/Pagination/Pagination.tsx";
 import ErrorComponent from "../components/Error/ErrorComponent.tsx";
-import {useQuery, useQueryClient} from "@tanstack/react-query";
+import {useQueryClient} from "@tanstack/react-query";
 import PendingComponent from "../components/Pending/PendingComponent.tsx";
+import useAllCategories from "../services/CategoryService.tsx";
+import useAllProducts, {getProductsByCategories, searchProducts} from "../services/ProductService.tsx";
 
 const Products = () => {
     const [showAsListChecked, setShowAsListChecked] = useState(false);
@@ -29,47 +29,21 @@ const Products = () => {
 
     const queryClient = useQueryClient()
 
-    const getCategories = async () => {
-        const response = await axios.get<string[]>(`https://dummyjson.com/products/categories`)
-        return response.data
-    }
-
-    const getProducts = async () => {
-        const response = await
-            axios.get<ProductListResponse>(`https://dummyjson.com/products?page=${currentPage}&limit=${limit}&skip=${skip}`)
-        setTotalItems(response.data.total)
-        return response.data.products
-    }
-
     const {
         isPending: isProductsDataPending,
         isError: isProductsError,
         data: productsData
-    } = useQuery({
-        queryKey: ['products'],
-        queryFn: getProducts,
-    })
+    } = useAllProducts({currentPage, limit, skip})
+
+    useEffect(() => {
+        if (productsData) {
+            setTotalItems(productsData.total)
+        }
+    }, [productsData])
 
     const {
         data: categoriesData
-    } = useQuery({
-        queryKey: ['categories'],
-        queryFn: getCategories,
-    })
-
-    const searchProducts = async (term: string) => {
-        const response = await
-            axios.get<ProductListResponse>(`https://dummyjson.com/products/search?q=${term}`)
-        setTotalItems(response.data.total)
-        return response.data.products
-    }
-
-    const getProductsByCategories = async (category: string) => {
-        const response = await
-            axios.get<ProductListResponse>(`https://dummyjson.com/products/category/${category}`)
-        setTotalItems(response.data.total)
-        return response.data.products
-    }
+    } = useAllCategories()
 
     const handleCategoryChange = (event: SelectChangeEvent) => {
         event.preventDefault()
@@ -119,7 +93,7 @@ const Products = () => {
 
                 {showAsListChecked &&
                     <div className={'product-list-container'}>
-                        {productsData?.map((product) => (
+                        {productsData.products?.map((product) => (
                             <ProductListComponent product={product}/>
                         ))}
                     </div>}
@@ -133,7 +107,7 @@ const Products = () => {
                             justifyContent="space-evenly"
                             alignItems="center"
                         >
-                            {productsData?.map((product) => (
+                            {productsData.products?.map((product) => (
                                 <Grid item key={product.id} xs={12} md={4}
                                       display="flex"
                                       justifyContent="center"
