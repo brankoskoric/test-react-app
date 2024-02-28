@@ -70,7 +70,7 @@ const Dashboard = () => {
                             className="text-blue-800"
                             onClick={() => keycloak.logout()}
                         >
-                            Logout ({keycloak.tokenParsed.preferred_username})
+                            Logout ({keycloak.tokenParsed?.preferred_username})
                         </button>
                     )}
                 </Stack>
