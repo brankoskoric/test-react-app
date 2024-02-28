@@ -2,6 +2,7 @@ import {Button, Stack, Typography} from "@mui/material";
 import {useNavigate} from "react-router-dom";
 import {findPath} from "../routes/RoutesList.tsx";
 import RoutesIds from "../routes/RoutesIds.tsx";
+import {useKeycloak} from "@react-keycloak/web";
 
 const Dashboard = () => {
     const navigate = useNavigate()
@@ -12,6 +13,8 @@ const Dashboard = () => {
     const navigateNewProduct = () => {
         navigate(findPath(RoutesIds.ADD_PRODUCT))
     }
+
+    const {keycloak} = useKeycloak();
 
     return (
         <div>
@@ -52,6 +55,24 @@ const Dashboard = () => {
                 >
                     <Button variant={"contained"} size="medium" onClick={navigateProducts}>Products</Button>
                     <Button variant={"outlined"} size="medium" onClick={navigateNewProduct}>New product</Button>
+                    {!keycloak.authenticated && (
+                        <Button
+                            type="button"
+                            onClick={() => keycloak.login()}
+                        >
+                            Login
+                        </Button>
+                    )}
+
+                    {!!keycloak.authenticated && (
+                        <button
+                            type="button"
+                            className="text-blue-800"
+                            onClick={() => keycloak.logout()}
+                        >
+                            Logout ({keycloak.tokenParsed.preferred_username})
+                        </button>
+                    )}
                 </Stack>
             </Stack>
         </div>
