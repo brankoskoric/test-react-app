@@ -3,7 +3,6 @@ import ProductsDummy from "../pages/ProductsDummy.tsx";
 import Products from "../pages/Products.tsx";
 import ProductDetails from "../pages/ProductDetails.tsx";
 import AddProduct from "../pages/AddProduct.tsx";
-import PrivateRoute from "../auth/PrivateRoutes.tsx";
 
 const pages = [
     {name: "Home", path: "/", element: <Dashboard/>, isMainNavigation: true},
@@ -13,8 +12,7 @@ const pages = [
         element: <ProductDetails isDummy={false}/>, isMainNavigation: false},
     {name: "Product Detail Dummy", path: "/products/dummy/:productId",
         element: <ProductDetails isDummy/>, isMainNavigation: false},
-    {name: "Add product", path: "/products/dummy/new",
-        element: <PrivateRoute><AddProduct/></PrivateRoute>, isMainNavigation: true},
+    {name: "Add product", path: "/products/dummy/new", element: <AddProduct/>, isMainNavigation: true},
 ]
 
 export const findPath = (name: string): string => {
