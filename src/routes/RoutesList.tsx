@@ -6,7 +6,7 @@ import AddProduct from "../pages/AddProduct.tsx";
 import PrivateRoute from "../auth/PrivateRoutes.tsx";
 
 const pages = [
-    {name: "Home", path: "/", element: <Dashboard/>, isMainNavigation: true},
+    {name: "Home", path: "/*", element: <Dashboard/>, isMainNavigation: true},
     {name: "Products_Dummy", path: "/products/dummy", element: <ProductsDummy/>, isMainNavigation: true},
     {name: "Products", path: "/products", element: <Products/>, isMainNavigation: true},
     {name: "Product Detail", path: "/products/:productId",
