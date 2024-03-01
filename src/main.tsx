@@ -15,7 +15,7 @@ const queryClient = new QueryClient({
 })
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
-    <ReactKeycloakProvider authClient={keycloak}>
+    <ReactKeycloakProvider authClient={keycloak} initOptions={{responseMode: 'query'}}>
         <React.StrictMode>
             <QueryClientProvider client={queryClient}>
                 <App/>
