@@ -18,8 +18,7 @@ import React, {useState} from "react";
 import {Product} from "../interfaces/Entities.tsx"
 import ErrorComponent from "../components/Error/ErrorComponent.tsx";
 import PendingComponent from "../components/Pending/PendingComponent.tsx";
-import axios from "axios";
-import {useMutation} from "@tanstack/react-query";
+import {useCreateProduct} from "../services/ProductService.tsx";
 
 const AddProduct = () => {
     const emptyProduct = {
@@ -33,15 +32,15 @@ const AddProduct = () => {
         brand: '',
         category: '',
         thumbnail: '',
-        imageUrl:''
+        imageUrl: ''
 
     }
 
     const [productFormData, setProductFormData] = useState<Product>(emptyProduct)
 
     const {
-        isError,
-        isPending,
+        isError: isErrorCategories,
+        isPending: isPendingCategories,
         data: categories
     } = useAllCategories()
 
@@ -60,16 +59,17 @@ const AddProduct = () => {
         setProductFormData(prevData => ({...prevData, ["category"]: value}))
     }
 
-    const mutation = useMutation({
-        mutationFn: (newProduct: Product) => {
-            return axios.post("https://dummyjson.com/products/add", newProduct)
-        },
-    })
+    const {
+        mutate: mutateProduct,
+        isSuccess: isSuccessCreateProduct,
+        isError: isErrorCreateProduct,
+        error
+    } = useCreateProduct()
 
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault()
         console.log(productFormData)
-        mutation.mutate(productFormData)
+        mutateProduct(productFormData)
         setProductFormData(emptyProduct)
     }
 
@@ -100,15 +100,15 @@ const AddProduct = () => {
                 </Typography>
             </Stack>
 
-            {mutation.isSuccess ?
+            {isSuccessCreateProduct ?
                 <Alert severity="success" sx={{fontSize: "14px"}}>Product added</Alert> : null}
-            {mutation.isError ?
-                <Alert severity="error" sx={{fontSize: "14px"}}>Error: {mutation.error.message}</Alert> : null}
+            {isErrorCreateProduct ?
+                <Alert severity="error" sx={{fontSize: "14px"}}>Error: {error.message}</Alert> : null}
 
-            {isError && <ErrorComponent message={"Error"}/>}
-            {isPending && <PendingComponent/>}
+            {isErrorCategories && <ErrorComponent message={"Error"}/>}
+            {isPendingCategories && <PendingComponent/>}
 
-            {!isError && !isPending && <Container component="main" maxWidth="xs">
+            {!isErrorCategories && !isPendingCategories && <Container component="main" maxWidth="xs">
                 <Box
                     sx={{
                         marginTop: 2,
@@ -119,7 +119,7 @@ const AddProduct = () => {
                 >
                     <Box component="form" onSubmit={handleSubmit} sx={{mt: 3}}>
                         <Grid container spacing={2}>
-                            <Grid item xs={12} sm={6}>
+                            <Grid item xs={12} sm={12}>
                                 <TextField
                                     id="title"
                                     label="Title"
@@ -130,27 +130,15 @@ const AddProduct = () => {
                                     value={productFormData.title}
                                 />
                             </Grid>
-                            <Grid item xs={12} sm={6}>
-                                <TextField
-                                    id="brand"
-                                    label="Brand"
-                                    name="brand"
-                                    fullWidth
-                                    required
-                                    onChange={handleInput}
-                                    value={productFormData.brand}
-                                />
-                            </Grid>
-
                             <Grid item xs={12}>
                                 <TextField
-                                    id="thumbnail"
-                                    label="Thumbnail link"
-                                    name="thumbnail"
+                                    id="imageUrl"
+                                    label="Image url"
+                                    name="imageUrl"
                                     fullWidth
                                     required
                                     onChange={handleInput}
-                                    value={productFormData.thumbnail}
+                                    value={productFormData.imageUrl}
                                 />
                             </Grid>
 
@@ -164,41 +152,6 @@ const AddProduct = () => {
                                     required
                                     onChange={handleInput}
                                     value={productFormData.price}
-                                />
-                            </Grid>
-                            <Grid item xs={12} sm={6}>
-                                <TextField
-                                    id="stock"
-                                    label="Stock"
-                                    inputProps={{type: 'number'}}
-                                    fullWidth
-                                    name={"stock"}
-                                    required
-                                    onChange={handleInput}
-                                    value={productFormData.stock}
-                                />
-                            </Grid>
-
-                            <Grid item xs={12} sm={6}>
-                                <TextField
-                                    id="discountPercentage"
-                                    label="Discount percentage"
-                                    name={"discountPercentage"}
-                                    inputProps={{type: 'number'}}
-                                    fullWidth
-                                    onChange={handleInput}
-                                    value={productFormData.discountPercentage}
-                                />
-                            </Grid>
-                            <Grid item xs={12} sm={6}>
-                                <TextField
-                                    id="rating"
-                                    label="Rating"
-                                    name={"rating"}
-                                    inputProps={{type: 'number'}}
-                                    fullWidth
-                                    onChange={handleInput}
-                                    value={productFormData.rating}
                                 />
                             </Grid>
                             <Grid item xs={12} sm={12}>

@@ -10,7 +10,7 @@ import ErrorComponent from "../components/Error/ErrorComponent.tsx";
 import {useQueryClient} from "@tanstack/react-query";
 import PendingComponent from "../components/Pending/PendingComponent.tsx";
 import useAllCategories from "../services/CategoryService.tsx";
-import useAllProducts, {getProductsByCategories, searchProducts} from "../services/ProductService.tsx";
+import {getProductsByCategories, searchProducts, useAllProducts} from "../services/ProductService.tsx";
 
 const Products = () => {
     const [showAsListChecked, setShowAsListChecked] = useState(false);

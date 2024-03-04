@@ -1,13 +1,12 @@
-import {ProductListResponse} from "../interfaces/Entities.tsx";
+import {Product, ProductListResponse} from "../interfaces/Entities.tsx";
 import axios from "axios";
-import {useQuery} from "@tanstack/react-query";
+import {useMutation, useQuery} from "@tanstack/react-query";
 
-const useAllProducts = () => {
+export const useAllProducts = () => {
 
     const getProducts = async (): Promise<ProductListResponse> => {
         const response = await
             axios.get<ProductListResponse>(`https://product-backend-wwcv.onrender.com/api/v1/products`)
-        console.log(response.data)
         return response.data
     }
 
@@ -29,4 +28,11 @@ export const getProductsByCategories = async (category: string) => {
     return response.data
 }
 
-export default useAllProducts
+export const useCreateProduct = () => {
+    return useMutation({
+        mutationKey: ['createProduct'],
+        mutationFn: async (newProduct: Product) => {
+            return axios.post("https://product-backend-wwcv.onrender.com/api/v1/products", newProduct)
+        },
+    })
+}
