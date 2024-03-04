@@ -15,6 +15,8 @@ import PaginationItem from "@mui/material/PaginationItem";
 import {findPath} from "../routes/RoutesList.tsx";
 import RoutesIds from "../routes/RoutesIds.tsx";
 
+const defaultPageSize = 6;
+
 const Products = () => {
     const [showAsListChecked, setShowAsListChecked] = useState(false);
     const [totalItems, setTotalItems] = useState(0);
@@ -24,7 +26,7 @@ const Products = () => {
         const {search} = useLocation();
         return React.useMemo(() => new URLSearchParams(search), [search]);
     }
-    const defaultPageSize = 6;
+
     const query = useLocationQuery();
     const page: number = parseInt(query.get('page') ? query.get('page')! : '0');
     const size: number = parseInt(query.get('size') ? query.get('size')! : `${defaultPageSize}`);
@@ -35,7 +37,7 @@ const Products = () => {
         isPending: isProductsDataPending,
         isError: isProductsError,
         data: productsData
-    } = useAllProducts({page, size})
+    } = useAllProducts(page - 1, size)
 
     useEffect(() => {
         if (productsData) {
@@ -124,17 +126,12 @@ const Products = () => {
                      justifyContent='center'
                      sx={{m: 2}}>
                     <Pagination
-                        page={page + 1}
+                        page={page}
                         count={totalItems == 0 ? 1 : Math.ceil(totalItems / defaultPageSize)}
                         renderItem={(item) => {
-                            let apiPage = 0
-                            if (item.page) {
-                                apiPage = item.page - 1
-                            }
                             return <PaginationItem
                                 component={Link}
-                                to={`${findPath(RoutesIds.PRODUCTS)}${item.page == 1 ? '' :
-                                    `?page=${apiPage}&size=${defaultPageSize}`}`}
+                                to={`${findPath(RoutesIds.PRODUCTS)}${item.page == 1 ? '' : `?page=${item.page}`}`}
                                 {...item}
                             />
                         }}

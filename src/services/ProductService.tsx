@@ -2,7 +2,7 @@ import {Product, ProductListResponse} from "../interfaces/Entities.tsx";
 import axios from "axios";
 import {useMutation, useQuery} from "@tanstack/react-query";
 
-export const useAllProducts = ({page, size}: { page: number, size: number }) => {
+export const useAllProducts = (page:number, size: number ) => {
 
     const getProducts = async (): Promise<ProductListResponse> => {
         const response = await
