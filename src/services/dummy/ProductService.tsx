@@ -11,7 +11,7 @@ const useAllProducts = ({currentPage, limit, skip}: { currentPage: number, limit
     }
 
     return useQuery<ProductListResponseDummy>({
-        queryKey: ['products_dummy'],
+        queryKey: ['products_dummy', currentPage],
         queryFn: getProducts
     })
 }

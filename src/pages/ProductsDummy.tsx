@@ -4,13 +4,16 @@ import ProductCard from "../components/Product/ProductCard.tsx";
 import ProductListComponent from "../components/Product/ProductList.tsx";
 import FilterBox from "../components/Product/FilterBox.tsx";
 import "../pages/Product.css"
-import {useLocation} from "react-router-dom";
-import PaginationComponent from "../components/Pagination/Pagination.tsx";
+import {Link, useLocation} from "react-router-dom";
 import ErrorComponent from "../components/Error/ErrorComponent.tsx";
 import {useQueryClient} from "@tanstack/react-query";
 import PendingComponent from "../components/Pending/PendingComponent.tsx";
 import useAllCategories from "../services/dummy/CategoryService.tsx";
 import useAllProductsDummy, {getProductsByCategories, searchProducts} from "../services/dummy/ProductService.tsx";
+import {findPath} from "../routes/RoutesList.tsx";
+import RoutesIds from "../routes/RoutesIds.tsx";
+import Pagination from "@mui/material/Pagination";
+import PaginationItem from "@mui/material/PaginationItem";
 
 const ProductsDummy = () => {
     const [showAsListChecked, setShowAsListChecked] = useState(false);
@@ -122,7 +125,18 @@ const ProductsDummy = () => {
                 <Box display="flex"
                      justifyContent='center'
                      sx={{m: 2}}>
-                    <PaginationComponent page={currentPage} totalItems={totalItems} pageLimit={defaultPageSize}/>
+                    <Pagination
+                        page={currentPage}
+                        count={totalItems == 0 ? 1 : Math.ceil(totalItems / defaultPageSize)}
+                        renderItem={(item) => (
+                            <PaginationItem
+                                component={Link}
+                                to={`${findPath(RoutesIds.PRODUCTS_DUMMY)}${item.page == 1 ? '' : 
+                                    `?page=${item.page}&limit=${defaultPageSize}&skip=${(item.page! - 1) * defaultPageSize}`}`}
+                                {...item}
+                            />
+                        )}
+                    />
                 </Box>
             </>}
         </div>

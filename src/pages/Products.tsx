@@ -4,13 +4,16 @@ import ProductCard from "../components/Product/ProductCard.tsx";
 import ProductListComponent from "../components/Product/ProductList.tsx";
 import FilterBox from "../components/Product/FilterBox.tsx";
 import "../pages/Product.css"
-import {useLocation} from "react-router-dom";
-import PaginationComponent from "../components/Pagination/Pagination.tsx";
+import {Link, useLocation} from "react-router-dom";
 import ErrorComponent from "../components/Error/ErrorComponent.tsx";
 import {useQueryClient} from "@tanstack/react-query";
 import PendingComponent from "../components/Pending/PendingComponent.tsx";
 import useAllCategories from "../services/CategoryService.tsx";
 import {getProductsByCategories, searchProducts, useAllProducts} from "../services/ProductService.tsx";
+import Pagination from "@mui/material/Pagination";
+import PaginationItem from "@mui/material/PaginationItem";
+import {findPath} from "../routes/RoutesList.tsx";
+import RoutesIds from "../routes/RoutesIds.tsx";
 
 const Products = () => {
     const [showAsListChecked, setShowAsListChecked] = useState(false);
@@ -23,9 +26,8 @@ const Products = () => {
     }
     const defaultPageSize = 6;
     const query = useLocationQuery();
-    const currentPage: number = parseInt(query.get('page') ? query.get('page')! : '1');
-/*    const skip: number = parseInt(query.get('skip') ? query.get('skip')! : '0');
-    const limit: number = parseInt(query.get('limit') ? query.get('limit')! : `${defaultPageSize}`);*/
+    const page: number = parseInt(query.get('page') ? query.get('page')! : '0');
+    const size: number = parseInt(query.get('size') ? query.get('size')! : `${defaultPageSize}`);
 
     const queryClient = useQueryClient()
 
@@ -33,11 +35,11 @@ const Products = () => {
         isPending: isProductsDataPending,
         isError: isProductsError,
         data: productsData
-    } = useAllProducts()
+    } = useAllProducts({page, size})
 
     useEffect(() => {
         if (productsData) {
-            setTotalItems(productsData.numberOfElements)
+            setTotalItems(productsData.totalElements)
         }
     }, [productsData])
 
@@ -121,7 +123,22 @@ const Products = () => {
                 <Box display="flex"
                      justifyContent='center'
                      sx={{m: 2}}>
-                    <PaginationComponent page={currentPage} totalItems={totalItems} pageLimit={defaultPageSize}/>
+                    <Pagination
+                        page={page + 1}
+                        count={totalItems == 0 ? 1 : Math.ceil(totalItems / defaultPageSize)}
+                        renderItem={(item) => {
+                            let apiPage = 0
+                            if (item.page) {
+                                apiPage = item.page - 1
+                            }
+                            return <PaginationItem
+                                component={Link}
+                                to={`${findPath(RoutesIds.PRODUCTS)}${item.page == 1 ? '' :
+                                    `?page=${apiPage}&size=${defaultPageSize}`}`}
+                                {...item}
+                            />
+                        }}
+                    />
                 </Box>
             </>}
         </div>

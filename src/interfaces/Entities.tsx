@@ -19,5 +19,6 @@ export interface ProductListResponseDummy {
 
 export interface ProductListResponse {
     content: Product[]
-    numberOfElements: number
+    numberOfElements: number,
+    totalElements: number
 }

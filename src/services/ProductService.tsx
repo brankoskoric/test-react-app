@@ -2,16 +2,16 @@ import {Product, ProductListResponse} from "../interfaces/Entities.tsx";
 import axios from "axios";
 import {useMutation, useQuery} from "@tanstack/react-query";
 
-export const useAllProducts = () => {
+export const useAllProducts = ({page, size}: { page: number, size: number }) => {
 
     const getProducts = async (): Promise<ProductListResponse> => {
         const response = await
-            axios.get<ProductListResponse>(`https://product-backend-wwcv.onrender.com/api/v1/products`)
+            axios.get<ProductListResponse>(`https://product-backend-wwcv.onrender.com/api/v1/products?page=${page}&size=${size}`)
         return response.data
     }
 
     return useQuery<ProductListResponse>({
-        queryKey: ['products'],
+        queryKey: ['products', page],
         queryFn: getProducts
     })
 }
