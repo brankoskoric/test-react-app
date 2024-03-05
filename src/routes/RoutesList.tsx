@@ -13,7 +13,7 @@ const pages = [
         element: <ProductDetails isDummy={false}/>, isMainNavigation: false},
     {name: "Product Detail Dummy", path: "/products/dummy/:productId",
         element: <ProductDetails isDummy/>, isMainNavigation: false},
-    {name: "Add product", path: "/products/dummy/new",
+    {name: "Add product", path: "/products/new",
         element: <PrivateRoute><AddProduct/></PrivateRoute>, isMainNavigation: true},
 ]
 
