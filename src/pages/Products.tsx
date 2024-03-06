@@ -28,7 +28,7 @@ const Products = () => {
     }
 
     const query = useLocationQuery();
-    const page: number = parseInt(query.get('page') ? query.get('page')! : '0');
+    const page: number = parseInt(query.get('page') ? query.get('page')! : '1');
     const size: number = parseInt(query.get('size') ? query.get('size')! : `${defaultPageSize}`);
 
     const queryClient = useQueryClient()
@@ -36,7 +36,7 @@ const Products = () => {
     const {
         isPending: isProductsDataPending,
         isError: isProductsError,
-        data: productsData
+        data: productsData,
     } = useAllProducts(page - 1, size)
 
     useEffect(() => {
@@ -51,10 +51,16 @@ const Products = () => {
 
     const handleCategoryChange = (event: SelectChangeEvent) => {
         event.preventDefault()
-        getProductsByCategories(event.target.value)
-            .then((products) => {
-                queryClient.setQueryData(['products'], () => products)
-            })
+        getProductsByCategories(event.target.value, 0, defaultPageSize).then((res) => {
+            if (!res.last) {
+                for (let i = 1; i < res.totalPages; i++) {
+                    getProductsByCategories(event.target.value, i, defaultPageSize).then((r) => {
+                        queryClient.setQueryData(['products', i], () => r)
+                    })
+                }
+            }
+            queryClient.setQueryData(['products', 0], () => res)
+        })
     }
 
     const handleSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -66,11 +72,17 @@ const Products = () => {
     }
 
     const debouncedSearch = React.useRef(
-        debounce(async (criteria: string) => {
-            searchProducts(criteria)
-                .then((products) => {
-                    queryClient.setQueryData(['products'], () => products)
-                })
+        debounce(async (term: string) => {
+            searchProducts(term, 0, defaultPageSize).then((res) => {
+                if (!res.last) {
+                    for (let i = 1; i < res.totalPages; i++) {
+                        searchProducts(term, i, defaultPageSize).then((r) => {
+                            queryClient.setQueryData(['products', i], () => r)
+                        })
+                    }
+                }
+                queryClient.setQueryData(['products', 0], () => res)
+            })
         }, 300)
     ).current;
 
